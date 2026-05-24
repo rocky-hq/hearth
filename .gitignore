@@ -1,0 +1,14 @@
+# Go
+*.test
+*.out
+/dist/
+/bin/
+/coverage.out
+
+# Generated schemas snapshot (synced from contracts in 5b+)
+/schemas/schemas.json
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
