@@ -1,0 +1,72 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+      - name: Install gofumpt
+        run: go install mvdan.cc/gofumpt@latest
+      - name: gofumpt
+        run: |
+          out=$(gofumpt -l .)
+          if [ -n "$out" ]; then
+            echo "gofumpt would reformat:"
+            echo "$out"
+            exit 1
+          fi
+      - name: go vet
+        run: go vet ./...
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
+      - name: golangci-lint
+        run: golangci-lint run
+      - name: go mod tidy
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod
+          # go.sum only exists when there are dependencies; skip if absent.
+          if [ -f go.sum ]; then git diff --exit-code go.sum; fi
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+      - run: go build ./...
+      - run: go test ./... -race -count=1
+
+  integration:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'integration') || github.event_name == 'push' }}
+    env:
+      ROCKY_HEARTH_INTEGRATION: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+      # Phase 5a: integration suite is a stub (no test/integration/ files yet).
+      # The job exists so 5c's PR adds tests under test/integration/ without
+      # also having to wire CI.
+      - name: "integration tests (Phase 5a: stub)"
+        run: |
+          if [ -d test/integration ]; then
+            go test ./test/integration/... -race -count=1
+          else
+            echo "No test/integration/ yet — Phase 5c lands the LocalDocker tests."
+          fi
