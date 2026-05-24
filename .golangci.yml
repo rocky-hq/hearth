@@ -1,0 +1,67 @@
+# .golangci.yml — hearth lint baseline (Phase 5a)
+# Derived from k41ex/kalnet/.golangci.yml, trimmed for a small interface-only module.
+# See docs note in rocky-hq/docs/plans/2026-05-24-hearth-bootstrap-phase-5a.md (Task 3).
+
+run:
+  timeout: 5m
+  tests: true
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+  staticcheck:
+    checks: ["all"]
+  stylecheck:
+    checks: ["all", "-ST1000"]
+  gocyclo:
+    min-complexity: 15
+  goimports:
+    local-prefixes: github.com/rocky-hq/hearth
+  misspell:
+    locale: US
+  depguard:
+    rules:
+      main:
+        deny:
+          - pkg: "io/ioutil"
+            desc: "Use io and os packages instead"
+          - pkg: "github.com/pkg/errors"
+            desc: "Use stdlib errors + fmt.Errorf"
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - bodyclose
+    - noctx
+    - nilerr
+    - copyloopvar
+    - gocyclo
+    - goimports
+    - gofmt
+    - revive
+    - stylecheck
+    - unconvert
+    - misspell
+    - whitespace
+    - errorlint
+    - depguard
+
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 10
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
