@@ -34,7 +34,9 @@ jobs:
       - name: go mod tidy
         run: |
           go mod tidy
-          git diff --exit-code go.mod go.sum
+          git diff --exit-code go.mod
+          # go.sum only exists when there are dependencies; skip if absent.
+          if [ -f go.sum ]; then git diff --exit-code go.sum; fi
 
   test:
     runs-on: ubuntu-latest
