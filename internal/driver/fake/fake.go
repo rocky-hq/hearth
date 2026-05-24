@@ -67,6 +67,12 @@ func (f *FakeDriver) Provision(ctx context.Context, slug string, profile driver.
 
 // Status is read-only. Returns StatusTierTornDown for any slug that has
 // been torn down, regardless of the (tier, driver) on the supplied ref.
+//
+// FakeDriver returns StatusReady as the default for any ref that was
+// neither provisioned through this instance nor torn down — useful for
+// unit tests that construct a synthetic DeploymentRef without a prior
+// Provision call. Real drivers (e.g. LocalDocker in Phase 5c) should
+// instead surface an error for unknown refs so misuse is detectable.
 func (f *FakeDriver) Status(ctx context.Context, ref driver.DeploymentRef) (driver.Status, error) {
 	if err := ctx.Err(); err != nil {
 		return "", err
