@@ -19,8 +19,8 @@ import "context"
 //   - Teardown is irreversible. After it returns, Status against the
 //     same ref returns StatusTierTornDown (a terminal state, not an
 //     error).
-//   - All four methods MUST honour ctx.Done() and return promptly with
-//     ctx.Err() when cancelled.
+//   - All four methods MUST honor ctx.Done() and return promptly with
+//     ctx.Err() when canceled.
 type Driver interface {
 	Provision(ctx context.Context, slug string, profile ProvisioningProfile) (DeploymentRef, error)
 	Status(ctx context.Context, ref DeploymentRef) (Status, error)

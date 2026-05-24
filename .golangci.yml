@@ -65,3 +65,8 @@ issues:
       linters:
         - gocyclo
         - errcheck
+        - govet
+    # Locked spec names: DriverName is intentionally driver.DriverName; FakeDriver is intentionally fake.FakeDriver.
+    - linters:
+        - revive
+      text: "stutters"
