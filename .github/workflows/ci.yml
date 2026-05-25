@@ -18,7 +18,6 @@ on:
 # visibility decision").
 env:
   GOPRIVATE: github.com/rocky-hq/*
-  GONOSUMCHECK: "*"
 
 jobs:
   lint:
