@@ -6,6 +6,19 @@ on:
   push:
     branches: [main]
 
+# `github.com/rocky-hq/contracts/go` is a private Go module — the public
+# Go module proxy cannot resolve it. GOPRIVATE tells `go get` to bypass
+# the proxy/sumdb for rocky-hq paths; each job that runs `go mod` /
+# `go build` then configures git with a read-only PAT (org secret
+# ROCKY_HQ_RO_TOKEN) so the direct git fetch authenticates.
+#
+# Forks: this token is org-scoped; PRs from public forks will fail at
+# the `go mod download` step. That's an accepted tradeoff for keeping
+# contracts private (see rocky-hq/rocky Phase 5b plan §"Contracts
+# visibility decision").
+env:
+  GOPRIVATE: github.com/rocky-hq/*
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -15,6 +28,9 @@ jobs:
         with:
           go-version: "1.25"
           cache: true
+      - name: Authenticate to rocky-hq private Go modules
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.ROCKY_HQ_RO_TOKEN }}@github.com/rocky-hq/".insteadOf "https://github.com/rocky-hq/"
       - name: Install gofumpt
         run: go install mvdan.cc/gofumpt@latest
       - name: gofumpt
@@ -46,6 +62,9 @@ jobs:
         with:
           go-version: "1.25"
           cache: true
+      - name: Authenticate to rocky-hq private Go modules
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.ROCKY_HQ_RO_TOKEN }}@github.com/rocky-hq/".insteadOf "https://github.com/rocky-hq/"
       - run: go build ./...
       - run: go test ./... -race -count=1
 
@@ -60,6 +79,9 @@ jobs:
         with:
           go-version: "1.25"
           cache: true
+      - name: Authenticate to rocky-hq private Go modules
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.ROCKY_HQ_RO_TOKEN }}@github.com/rocky-hq/".insteadOf "https://github.com/rocky-hq/"
       # Phase 5a: integration suite is a stub (no test/integration/ files yet).
       # The job exists so 5c's PR adds tests under test/integration/ without
       # also having to wire CI.

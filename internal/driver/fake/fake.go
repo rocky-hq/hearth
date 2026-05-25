@@ -57,7 +57,7 @@ func (f *FakeDriver) Provision(ctx context.Context, slug string, profile driver.
 		Driver:           profile.Driver,
 		Endpoint:         fmt.Sprintf("fake://%s", slug),
 		SecretsVaultPath: fmt.Sprintf("vault://hearth/%s", slug),
-		Created:          f.now().Format(time.RFC3339),
+		Created:          f.now(),
 		LastStatus:       driver.StatusReady,
 	}
 	f.deployments[key] = ref
@@ -107,7 +107,7 @@ func (f *FakeDriver) Upgrade(ctx context.Context, ref driver.DeploymentRef, prof
 		Driver:           profile.Driver,
 		Endpoint:         fmt.Sprintf("fake://%s", ref.WorkspaceSlug),
 		SecretsVaultPath: fmt.Sprintf("vault://hearth/%s", ref.WorkspaceSlug),
-		Created:          f.now().Format(time.RFC3339),
+		Created:          f.now(),
 		LastStatus:       driver.StatusReady,
 	}
 	f.deployments[provisionKey(newRef.WorkspaceSlug, newRef.Tier, newRef.Driver)] = newRef
